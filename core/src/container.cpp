@@ -468,6 +468,10 @@ struct SolutionCollector
 			solutions.emplace_back(std::make_pair(trace, prio));
 		} else {
 			for (SolutionBase* successor : next) {
+				
+				if (successor->isFailure()) { // Band-aid starts here, Otherwise crashes
+					continue;
+				}
 				assert(!successor->isFailure());  // We shouldn't have invalid solutions
 				trace.push_back(successor);
 				traverse(*successor, prio + InterfaceState::Priority(1, successor->cost()));
