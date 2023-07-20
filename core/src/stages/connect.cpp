@@ -60,7 +60,7 @@ Connect::Connect(const std::string& name, const GroupPlannerVector& planners) : 
 	p.declare<moveit_msgs::msg::Constraints>("path_constraints", moveit_msgs::msg::Constraints(),
 	                                         "constraints to maintain during trajectory");
 	properties().declare<TimeParameterizationPtr>("merge_time_parameterization",
-	                                              std::make_shared<TimeOptimalTrajectoryGeneration>());
+	                                              std::make_shared<TimeOptimalTrajectoryGeneration>(0.1, 0.025, 0.001));
 }
 
 void Connect::reset() {
@@ -187,6 +187,7 @@ Connect::makeSequential(const std::vector<robot_trajectory::RobotTrajectoryConst
 	assert(!sub_trajectories.empty());
 	assert(sub_trajectories.size() + 1 == intermediate_scenes.size());
 
+	std::cout << "Running makeSequential on solution." << std::endl;
 	/* We need to decouple the sequence of subsolutions, created here, from the external from and to states.
 	   Hence, we create new interface states for all subsolutions. */
 	const InterfaceState* start = &*states_.insert(states_.end(), InterfaceState(from.scene()));
@@ -220,6 +221,8 @@ Connect::makeSequential(const std::vector<robot_trajectory::RobotTrajectoryConst
 SubTrajectoryPtr Connect::merge(const std::vector<robot_trajectory::RobotTrajectoryConstPtr>& sub_trajectories,
                                 const std::vector<planning_scene::PlanningSceneConstPtr>& intermediate_scenes,
                                 const moveit::core::RobotState& state) {
+
+	std::cout << "Running trajectory merge on solution." << std::endl;
 	// no need to merge if there is only a single sub trajectory
 	if (sub_trajectories.size() == 1)
 		return std::make_shared<SubTrajectory>(sub_trajectories[0]);
