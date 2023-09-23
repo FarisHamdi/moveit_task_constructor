@@ -49,16 +49,18 @@ namespace moveit {
 namespace task_constructor {
 namespace stages {
 
+static const rclcpp::Logger LOGGER = rclcpp::get_logger("Connect");
+
 Connect::Connect(const std::string& name, const GroupPlannerVector& planners) : Connecting(name), planner_(planners) {
 	setTimeout(1.0);
 	setCostTerm(std::make_unique<cost::PathLength>());
 
 	auto& p = properties();
 	p.declare<MergeMode>("merge_mode", WAYPOINTS, "merge mode");
-	p.declare<moveit_msgs::Constraints>("path_constraints", moveit_msgs::Constraints(),
-	                                    "constraints to maintain during trajectory");
+	p.declare<moveit_msgs::msg::Constraints>("path_constraints", moveit_msgs::msg::Constraints(),
+	                                         "constraints to maintain during trajectory");
 	properties().declare<TimeParameterizationPtr>("merge_time_parameterization",
-	                                              std::make_shared<TimeOptimalTrajectoryGeneration>());
+	                                              std::make_shared<TimeOptimalTrajectoryGeneration>(0.1, 0.025, 0.001));
 }
 
 void Connect::reset() {
@@ -93,7 +95,7 @@ void Connect::init(const core::RobotModelConstPtr& robot_model) {
 		try {
 			merged_jmg_.reset(task_constructor::merge(groups));
 		} catch (const std::runtime_error& e) {
-			ROS_INFO_STREAM_NAMED("Connect", this->name() << ": " << e.what() << ". Disabling merging.");
+			RCLCPP_INFO_STREAM(LOGGER, this->name() << ": " << e.what() << ". Disabling merging.");
 		}
 	}
 
@@ -124,8 +126,8 @@ bool Connect::compatible(const InterfaceState& from_state, const InterfaceState&
 		Eigen::Map<const Eigen::VectorXd> positions_from(from.getJointPositions(jm), num);
 		Eigen::Map<const Eigen::VectorXd> positions_to(to.getJointPositions(jm), num);
 		if (!(positions_from - positions_to).isZero(1e-4)) {
-			ROS_INFO_STREAM_NAMED("Connect", "Deviation in joint " << jm->getName() << ": [" << positions_from.transpose()
-			                                                       << "] != [" << positions_to.transpose() << "]");
+			RCLCPP_INFO_STREAM(LOGGER, "Deviation in joint " << jm->getName() << ": [" << positions_from.transpose()
+			                                                 << "] != [" << positions_to.transpose() << "]");
 			return false;
 		}
 	}
@@ -136,7 +138,7 @@ void Connect::compute(const InterfaceState& from, const InterfaceState& to) {
 	const auto& props = properties();
 	double timeout = this->timeout();
 	MergeMode mode = props.get<MergeMode>("merge_mode");
-	const auto& path_constraints = props.get<moveit_msgs::Constraints>("path_constraints");
+	const auto& path_constraints = props.get<moveit_msgs::msg::Constraints>("path_constraints");
 
 	const moveit::core::RobotState& final_goal_state = to.scene()->getCurrentState();
 	std::vector<robot_trajectory::RobotTrajectoryConstPtr> sub_trajectories;
@@ -152,7 +154,7 @@ void Connect::compute(const InterfaceState& from, const InterfaceState& to) {
 		planning_scene::PlanningScenePtr end = start->diff();
 		const moveit::core::JointModelGroup* jmg = final_goal_state.getJointModelGroup(pair.first);
 		final_goal_state.copyJointGroupPositions(jmg, positions);
-		robot_state::RobotState& goal_state = end->getCurrentStateNonConst();
+		moveit::core::RobotState& goal_state = end->getCurrentStateNonConst();
 		goal_state.setJointGroupPositions(jmg, positions);
 		goal_state.update();
 		intermediate_scenes.push_back(end);
@@ -185,6 +187,7 @@ Connect::makeSequential(const std::vector<robot_trajectory::RobotTrajectoryConst
 	assert(!sub_trajectories.empty());
 	assert(sub_trajectories.size() + 1 == intermediate_scenes.size());
 
+	std::cout << "Running makeSequential on solution." << std::endl;
 	/* We need to decouple the sequence of subsolutions, created here, from the external from and to states.
 	   Hence, we create new interface states for all subsolutions. */
 	const InterfaceState* start = &*states_.insert(states_.end(), InterfaceState(from.scene()));
@@ -218,6 +221,8 @@ Connect::makeSequential(const std::vector<robot_trajectory::RobotTrajectoryConst
 SubTrajectoryPtr Connect::merge(const std::vector<robot_trajectory::RobotTrajectoryConstPtr>& sub_trajectories,
                                 const std::vector<planning_scene::PlanningSceneConstPtr>& intermediate_scenes,
                                 const moveit::core::RobotState& state) {
+
+	std::cout << "Running trajectory merge on solution." << std::endl;
 	// no need to merge if there is only a single sub trajectory
 	if (sub_trajectories.size() == 1)
 		return std::make_shared<SubTrajectory>(sub_trajectories[0]);
@@ -231,7 +236,7 @@ SubTrajectoryPtr Connect::merge(const std::vector<robot_trajectory::RobotTraject
 
 	// check merged trajectory for collisions
 	if (!intermediate_scenes.front()->isPathValid(*trajectory,
-	                                              properties().get<moveit_msgs::Constraints>("path_constraints")))
+	                                              properties().get<moveit_msgs::msg::Constraints>("path_constraints")))
 		return SubTrajectoryPtr();
 
 	return std::make_shared<SubTrajectory>(trajectory);

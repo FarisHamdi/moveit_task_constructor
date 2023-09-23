@@ -14,11 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install clang-format-10
-        run: sudo apt-get install clang-format-10
-      - uses: rhaschke/install-catkin_lint-action@v1.0
         with:
-          distro: noetic
+          submodules: recursive
+      - name: Install clang-format-12
+        run: sudo apt-get install clang-format-12
       - uses: pre-commit/action@v3.0.0
         id: precommit
       - name: Upload pre-commit changes
