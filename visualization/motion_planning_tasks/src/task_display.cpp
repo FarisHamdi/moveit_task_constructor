@@ -44,7 +44,7 @@
 #include <moveit/visualization_tools/task_solution_visualization.h>
 #include <moveit/visualization_tools/marker_visualization.h>
 #include <moveit/visualization_tools/display_solution.h>
-#include <moveit_task_constructor_msgs/srv/get_solution.hpp>
+#include <p3_ros_msgs/srv/get_solution.hpp>
 
 #include <moveit/rdf_loader/rdf_loader.h>
 #include <moveit/robot_model/robot_model.h>
@@ -79,7 +79,7 @@ TaskDisplay::TaskDisplay() : Display(), panel_requested_(false), received_task_d
 	    this, SLOT(changedRobotDescription()), this);
 
 	task_solution_topic_property_ = new rviz_common::properties::RosTopicProperty(
-	    "Task Solution Topic", "", rosidl_generator_traits::data_type<moveit_task_constructor_msgs::msg::Solution>(),
+	    "Task Solution Topic", "", rosidl_generator_traits::data_type<p3_ros_msgs::msg::Solution>(),
 	    "The topic on which task solutions (moveit_msgs::Solution messages) are received", this,
 	    SLOT(changedTaskSolutionTopic()), this);
 
@@ -198,11 +198,13 @@ void TaskDisplay::changedRobotDescription() {
 		loadRobotModel();
 }
 
-void TaskDisplay::taskDescriptionCB(const moveit_task_constructor_msgs::msg::TaskDescription::ConstSharedPtr& msg) {
+void TaskDisplay::taskDescriptionCB(const p3_ros_msgs::msg::TaskDescription::ConstSharedPtr& msg) {
 	setStatus(rviz_common::properties::StatusProperty::Ok, "Task Monitor", "OK");
 	requestPanel();
 	task_list_model_->processTaskDescriptionMessage(*msg, base_ns_ + GET_SOLUTION_SERVICE "_" + msg->task_id);
 
+	RCLCPP_INFO(LOGGER, "TaskDescriptionCB");
+	RCLCPP_INFO(LOGGER, "TaskID: %s", msg->task_id.c_str());
 	// Start listening to other topics if this is the first description
 	// Waiting for the description ensures we do not receive data that cannot be interpreted yet
 	if (!received_task_description_ && !msg->stages.empty()) {
@@ -211,23 +213,25 @@ void TaskDisplay::taskDescriptionCB(const moveit_task_constructor_msgs::msg::Tas
 			RCLCPP_INFO(LOGGER, "Unable to lock weak_ptr from DisplayContext in taskDescriptionCB");
 			return;
 		}
+
+		RCLCPP_INFO(LOGGER, "Subscribing to task statistics and solution topics");
 		auto node = ros_node_abstraction->get_raw_node();
 		received_task_description_ = true;
-		task_statistics_sub = node->create_subscription<moveit_task_constructor_msgs::msg::TaskStatistics>(
+		task_statistics_sub = node->create_subscription<p3_ros_msgs::msg::TaskStatistics>(
 		    base_ns_ + STATISTICS_TOPIC, rclcpp::QoS(2).transient_local(),
 		    std::bind(&TaskDisplay::taskStatisticsCB, this, std::placeholders::_1));
-		task_solution_sub = node->create_subscription<moveit_task_constructor_msgs::msg::Solution>(
+		task_solution_sub = node->create_subscription<p3_ros_msgs::msg::Solution>(
 		    base_ns_ + SOLUTION_TOPIC, rclcpp::QoS(2).transient_local(),
 		    std::bind(&TaskDisplay::taskSolutionCB, this, std::placeholders::_1));
 	}
 }
 
-void TaskDisplay::taskStatisticsCB(const moveit_task_constructor_msgs::msg::TaskStatistics::ConstSharedPtr& msg) {
+void TaskDisplay::taskStatisticsCB(const p3_ros_msgs::msg::TaskStatistics::ConstSharedPtr& msg) {
 	setStatus(rviz_common::properties::StatusProperty::Ok, "Task Monitor", "OK");
 	task_list_model_->processTaskStatisticsMessage(*msg);
 }
 
-void TaskDisplay::taskSolutionCB(const moveit_task_constructor_msgs::msg::Solution::ConstSharedPtr& msg) {
+void TaskDisplay::taskSolutionCB(const p3_ros_msgs::msg::Solution::ConstSharedPtr& msg) {
 	setStatus(rviz_common::properties::StatusProperty::Ok, "Task Monitor", "OK");
 	try {
 		const DisplaySolutionPtr& s = task_list_model_->processSolutionMessage(*msg);
@@ -269,7 +273,7 @@ void TaskDisplay::changedTaskSolutionTopic() {
 	}
 	// listen to task descriptions updates
 	task_description_sub =
-	    ros_node_abstraction->get_raw_node()->create_subscription<moveit_task_constructor_msgs::msg::TaskDescription>(
+	    ros_node_abstraction->get_raw_node()->create_subscription<p3_ros_msgs::msg::TaskDescription>(
 	        base_ns_ + DESCRIPTION_TOPIC, rclcpp::QoS(10).transient_local(),
 	        std::bind(&TaskDisplay::taskDescriptionCB, this, std::placeholders::_1));
 

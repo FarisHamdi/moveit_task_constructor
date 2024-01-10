@@ -38,7 +38,7 @@
 
 #include "task_list_model.h"
 #include <moveit/visualization_tools/display_solution.h>
-#include <moveit_task_constructor_msgs/srv/get_solution.hpp>
+#include <p3_ros_msgs/srv/get_solution.hpp>
 #include <rclcpp/client.hpp>
 #include <memory>
 #include <limits>
@@ -55,7 +55,7 @@ class RemoteTaskModel : public BaseTaskModel
 	Q_OBJECT
 	struct Node;
 	Node* const root_;
-	rclcpp::Client<moveit_task_constructor_msgs::srv::GetSolution>::SharedPtr get_solution_client_;
+	rclcpp::Client<p3_ros_msgs::srv::GetSolution>::SharedPtr get_solution_client_;
 	// TODO(JafarAbdi): We shouldn't need this, replace with callback groups (should be fully available in Galactic)
 	// RViz have a single threaded executor which is causing the get_solution_client_ to timeout without
 	// getting the result
@@ -69,7 +69,7 @@ class RemoteTaskModel : public BaseTaskModel
 
 	Node* node(uint32_t stage_id) const;
 	inline RemoteSolutionModel* getSolutionModel(uint32_t stage_id) const;
-	void setSolutionData(const moveit_task_constructor_msgs::msg::SolutionInfo& info);
+	void setSolutionData(const p3_ros_msgs::msg::SolutionInfo& info);
 
 public:
 	RemoteTaskModel(const std::string& service_name, const planning_scene::PlanningSceneConstPtr& scene,
@@ -85,9 +85,9 @@ public:
 	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
 	QModelIndex indexFromStageId(size_t id) const override;
-	void processStageDescriptions(const moveit_task_constructor_msgs::msg::TaskDescription::_stages_type& msg);
-	void processStageStatistics(const moveit_task_constructor_msgs::msg::TaskStatistics::_stages_type& msg);
-	DisplaySolutionPtr processSolutionMessage(const moveit_task_constructor_msgs::msg::Solution& msg);
+	void processStageDescriptions(const p3_ros_msgs::msg::TaskDescription::_stages_type& msg);
+	void processStageStatistics(const p3_ros_msgs::msg::TaskStatistics::_stages_type& msg);
+	DisplaySolutionPtr processSolutionMessage(const p3_ros_msgs::msg::Solution& msg);
 
 	QAbstractItemModel* getSolutionModel(const QModelIndex& index) override;
 	DisplaySolutionPtr getSolution(const QModelIndex& index) override;

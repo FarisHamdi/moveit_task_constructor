@@ -42,7 +42,7 @@
 #include "ui_task_panel.h"
 #include "ui_task_view.h"
 #include "ui_global_settings.h"
-#include <moveit_task_constructor_msgs/action/execute_task_solution.hpp>
+#include <p3_ros_msgs/action/execute_task_solution.hpp>
 #include <rclcpp_action/client.hpp>
 
 #include <rviz_common/panel.hpp>
@@ -91,7 +91,7 @@ public:
 	TaskView* q_ptr;
 	QPointer<TaskDisplay> locked_display_;
 	rclcpp::Node::SharedPtr node_;
-	rclcpp_action::Client<moveit_task_constructor_msgs::action::ExecuteTaskSolution>::SharedPtr exec_action_client_;
+	rclcpp_action::Client<p3_ros_msgs::action::ExecuteTaskSolution>::SharedPtr exec_action_client_;
 };
 
 class GlobalSettingsWidgetPrivate : public Ui_GlobalSettingsWidget

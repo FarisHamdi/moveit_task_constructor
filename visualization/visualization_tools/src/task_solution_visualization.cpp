@@ -526,7 +526,7 @@ void TaskSolutionVisualization::renderPlanningScene(const planning_scene::Planni
 	    static_cast<OctreeVoxelColorMode>(octree_coloring_property_->getOptionInt()), scene_alpha_property_->getFloat());
 }
 
-void TaskSolutionVisualization::showTrajectory(const moveit_task_constructor_msgs::msg::Solution& msg) {
+void TaskSolutionVisualization::showTrajectory(const p3_ros_msgs::msg::Solution& msg) {
 	DisplaySolutionPtr s(new DisplaySolution);
 	s->setFromMessage(scene_, msg);
 	showTrajectory(s, false);

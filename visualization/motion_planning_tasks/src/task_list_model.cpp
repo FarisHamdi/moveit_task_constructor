@@ -239,7 +239,7 @@ QVariant TaskListModel::data(const QModelIndex& index, int role) const {
 
 // process a task description message:
 // update existing RemoteTask, create a new one, or (if msg.stages is empty) delete an existing one
-void TaskListModel::processTaskDescriptionMessage(const moveit_task_constructor_msgs::msg::TaskDescription& msg,
+void TaskListModel::processTaskDescriptionMessage(const p3_ros_msgs::msg::TaskDescription& msg,
                                                   const std::string& service_name) {
 	// retrieve existing or insert new remote task for given task id
 	auto it_inserted = remote_tasks_.insert(std::make_pair(msg.task_id, nullptr));
@@ -278,7 +278,7 @@ void TaskListModel::processTaskDescriptionMessage(const moveit_task_constructor_
 }
 
 // process a task statistics message
-void TaskListModel::processTaskStatisticsMessage(const moveit_task_constructor_msgs::msg::TaskStatistics& msg) {
+void TaskListModel::processTaskStatisticsMessage(const p3_ros_msgs::msg::TaskStatistics& msg) {
 	auto it = remote_tasks_.find(msg.task_id);
 	if (it == remote_tasks_.cend()) {
 		RCLCPP_WARN(LOGGER, "unknown task: %s", msg.task_id.c_str());
@@ -292,7 +292,7 @@ void TaskListModel::processTaskStatisticsMessage(const moveit_task_constructor_m
 	remote_task->processStageStatistics(msg.stages);
 }
 
-DisplaySolutionPtr TaskListModel::processSolutionMessage(const moveit_task_constructor_msgs::msg::Solution& msg) {
+DisplaySolutionPtr TaskListModel::processSolutionMessage(const p3_ros_msgs::msg::Solution& msg) {
 	auto it = remote_tasks_.find(msg.task_id);
 	if (it == remote_tasks_.cend())
 		return DisplaySolutionPtr();  // unkown task

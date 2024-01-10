@@ -89,7 +89,7 @@ const MarkerVisualizationPtr DisplaySolution::markers(const DisplaySolution::Ind
 }
 
 void DisplaySolution::setFromMessage(const planning_scene::PlanningScenePtr& start_scene,
-                                     const moveit_task_constructor_msgs::msg::Solution& msg) {
+                                     const p3_ros_msgs::msg::Solution& msg) {
 	if (msg.start_scene.robot_model_name != start_scene->getRobotModel()->getName()) {
 		static boost::format fmt("Solution for model '%s' but model '%s' was expected");
 		fmt % msg.start_scene.robot_model_name.c_str() % start_scene->getRobotModel()->getName().c_str();
@@ -129,7 +129,7 @@ void DisplaySolution::setFromMessage(const planning_scene::PlanningScenePtr& sta
 	}
 }
 
-void DisplaySolution::fillMessage(moveit_task_constructor_msgs::msg::Solution& msg) const {
+void DisplaySolution::fillMessage(p3_ros_msgs::msg::Solution& msg) const {
 	start_scene_->getPlanningSceneMsg(msg.start_scene);
 	msg.sub_trajectory.resize(data_.size());
 	auto traj_it = msg.sub_trajectory.begin();

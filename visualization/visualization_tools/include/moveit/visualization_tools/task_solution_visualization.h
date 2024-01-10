@@ -37,7 +37,7 @@
 #pragma once
 
 #include <moveit/macros/class_forward.h>
-#include <moveit_task_constructor_msgs/msg/solution.hpp>
+#include <p3_ros_msgs/msg/solution.hpp>
 #include <QObject>
 #include <boost/thread/mutex.hpp>
 
@@ -114,7 +114,7 @@ public:
 	void setName(const QString& name);
 
 	planning_scene::PlanningSceneConstPtr getScene() const { return scene_; }
-	void showTrajectory(const moveit_task_constructor_msgs::msg::Solution& msg);
+	void showTrajectory(const p3_ros_msgs::msg::Solution& msg);
 	void showTrajectory(const moveit_rviz_plugin::DisplaySolutionPtr& s, bool lock);
 	void unlock();
 

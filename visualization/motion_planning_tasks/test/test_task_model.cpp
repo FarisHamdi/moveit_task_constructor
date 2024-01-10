@@ -56,13 +56,13 @@ protected:
 	int num_inserts = 0;
 	int num_updates = 0;
 
-	moveit_task_constructor_msgs::msg::TaskDescription genMsg(const std::string& name,
+	p3_ros_msgs::msg::TaskDescription genMsg(const std::string& name,
 	                                                          const std::string& task_id = std::string()) {
-		moveit_task_constructor_msgs::msg::TaskDescription t;
+		p3_ros_msgs::msg::TaskDescription t;
 		uint id = 0, root_id;
 		t.task_id = task_id.empty() ? name : task_id;
 
-		moveit_task_constructor_msgs::msg::StageDescription desc;
+		p3_ros_msgs::msg::StageDescription desc;
 		desc.parent_id = id;
 		desc.id = root_id = ++id;
 		desc.name = name;

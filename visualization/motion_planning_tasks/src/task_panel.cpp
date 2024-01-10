@@ -231,7 +231,7 @@ TaskViewPrivate::TaskViewPrivate(TaskView* view) : q_ptr(view) {
 	rclcpp::NodeOptions options;
 	options.arguments({ "--ros-args", "-r", "__node:=task_view_private" });
 	node_ = rclcpp::Node::make_shared("_", "", options);
-	exec_action_client_ = rclcpp_action::create_client<moveit_task_constructor_msgs::action::ExecuteTaskSolution>(
+	exec_action_client_ = rclcpp_action::create_client<p3_ros_msgs::action::ExecuteTaskSolution>(
 	    node_, "execute_task_solution");
 
 	MetaTaskListModel* meta_model = &MetaTaskListModel::instance();
@@ -549,7 +549,7 @@ void TaskView::onExecCurrentSolution() const {
 		return;
 	}
 
-	moveit_task_constructor_msgs::action::ExecuteTaskSolution::Goal goal;
+	p3_ros_msgs::action::ExecuteTaskSolution::Goal goal;
 	solution->fillMessage(goal.solution);
 	auto goal_handle_future = d_ptr->exec_action_client_->async_send_goal(goal);
 	if (rclcpp::spin_until_future_complete(d_ptr->node_, goal_handle_future) != rclcpp::FutureReturnCode::SUCCESS) {

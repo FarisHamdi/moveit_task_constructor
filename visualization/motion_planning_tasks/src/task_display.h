@@ -47,9 +47,9 @@
 #include "local_task_model.h"
 #include <moveit/macros/class_forward.h>
 #include <rclcpp/subscription.hpp>
-#include <moveit_task_constructor_msgs/msg/task_description.hpp>
-#include <moveit_task_constructor_msgs/msg/task_statistics.hpp>
-#include <moveit_task_constructor_msgs/msg/solution.hpp>
+#include <p3_ros_msgs/msg/task_description.hpp>
+#include <p3_ros_msgs/msg/task_statistics.hpp>
+#include <p3_ros_msgs/msg/solution.hpp>
 #endif
 
 namespace rviz_common {
@@ -116,9 +116,9 @@ private Q_SLOTS:
 	void onTasksRemoved(const QModelIndex& parent, int first, int last);
 	void onTaskDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
-	void taskDescriptionCB(const moveit_task_constructor_msgs::msg::TaskDescription::ConstSharedPtr& msg);
-	void taskStatisticsCB(const moveit_task_constructor_msgs::msg::TaskStatistics::ConstSharedPtr& msg);
-	void taskSolutionCB(const moveit_task_constructor_msgs::msg::Solution::ConstSharedPtr& msg);
+	void taskDescriptionCB(const p3_ros_msgs::msg::TaskDescription::ConstSharedPtr& msg);
+	void taskStatisticsCB(const p3_ros_msgs::msg::TaskStatistics::ConstSharedPtr& msg);
+	void taskSolutionCB(const p3_ros_msgs::msg::Solution::ConstSharedPtr& msg);
 
 protected:
 	/** @brief A Node which is registered with the main executor (used in the "update" thread).
@@ -126,9 +126,9 @@ protected:
 	 * This is configured after the constructor within the initialize() method of Display. */
 	rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node_;
 
-	rclcpp::Subscription<moveit_task_constructor_msgs::msg::Solution>::SharedPtr task_solution_sub;
-	rclcpp::Subscription<moveit_task_constructor_msgs::msg::TaskDescription>::SharedPtr task_description_sub;
-	rclcpp::Subscription<moveit_task_constructor_msgs::msg::TaskStatistics>::SharedPtr task_statistics_sub;
+	rclcpp::Subscription<p3_ros_msgs::msg::Solution>::SharedPtr task_solution_sub;
+	rclcpp::Subscription<p3_ros_msgs::msg::TaskDescription>::SharedPtr task_description_sub;
+	rclcpp::Subscription<p3_ros_msgs::msg::TaskStatistics>::SharedPtr task_statistics_sub;
 
 	// The trajectory playback component
 	std::unique_ptr<TaskSolutionVisualization> trajectory_visual_;

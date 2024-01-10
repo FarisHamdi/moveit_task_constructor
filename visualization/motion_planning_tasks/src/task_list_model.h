@@ -43,9 +43,9 @@
 
 #include <moveit/macros/class_forward.h>
 #include <rclcpp/node.hpp>
-#include <moveit_task_constructor_msgs/msg/task_description.hpp>
-#include <moveit_task_constructor_msgs/msg/task_statistics.hpp>
-#include <moveit_task_constructor_msgs/msg/solution.hpp>
+#include <p3_ros_msgs/msg/task_description.hpp>
+#include <p3_ros_msgs/msg/task_statistics.hpp>
+#include <p3_ros_msgs/msg/solution.hpp>
 
 #include <QAbstractItemModel>
 #include <QTreeView>
@@ -157,12 +157,12 @@ public:
 	QVariant data(const QModelIndex& index, int role) const override;
 
 	/// process an incoming task description message - only call in Qt's main loop
-	void processTaskDescriptionMessage(const moveit_task_constructor_msgs::msg::TaskDescription& msg,
+	void processTaskDescriptionMessage(const p3_ros_msgs::msg::TaskDescription& msg,
 	                                   const std::string& service_name);
 	/// process an incoming task description message - only call in Qt's main loop
-	void processTaskStatisticsMessage(const moveit_task_constructor_msgs::msg::TaskStatistics& msg);
+	void processTaskStatisticsMessage(const p3_ros_msgs::msg::TaskStatistics& msg);
 	/// process an incoming solution message - only call in Qt's main loop
-	DisplaySolutionPtr processSolutionMessage(const moveit_task_constructor_msgs::msg::Solution& msg);
+	DisplaySolutionPtr processSolutionMessage(const p3_ros_msgs::msg::Solution& msg);
 
 	/// insert a TaskModel, pos is relative to modelCount()
 	bool insertModel(BaseTaskModel* model, int pos = -1);

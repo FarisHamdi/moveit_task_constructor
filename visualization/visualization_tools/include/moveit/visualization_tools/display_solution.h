@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include <moveit_task_constructor_msgs/msg/solution.hpp>
+#include <p3_ros_msgs/msg/solution.hpp>
 #include <moveit/macros/class_forward.h>
 
 namespace moveit {
@@ -125,7 +125,7 @@ public:
 	const MarkerVisualizationPtr markersOfSubTrajectory(size_t index) const { return data_.at(index).markers_; }
 
 	void setFromMessage(const planning_scene::PlanningScenePtr& start_scene,
-	                    const moveit_task_constructor_msgs::msg::Solution& msg);
-	void fillMessage(moveit_task_constructor_msgs::msg::Solution& msg) const;
+	                    const p3_ros_msgs::msg::Solution& msg);
+	void fillMessage(p3_ros_msgs::msg::Solution& msg) const;
 };
 }  // namespace moveit_rviz_plugin
